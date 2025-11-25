@@ -1,4 +1,4 @@
-import streamlit as st
+perimport streamlit as st
 import pandas as pd
 import random
 
@@ -100,7 +100,7 @@ elif menu == "📝 Latihan Interaktif":
     
     # Tombol untuk Soal Baru
     if st.button("🔄 Soal Baru"):
-        st.rerun() # Memuat ulang halaman untuk soal baru
+        st.experimental_rerun() # Memuat ulang halaman untuk soal baru
 elif menu == "🏆 Kuis":
     st.header("Kuis: Tentukan Verb yang Tepat dalam Kalimat")
     
