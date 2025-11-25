@@ -145,4 +145,4 @@ elif menu == "🏆 Kuis":
     
     if st.button("Lanjut Soal Berikutnya", disabled=st.session_state.current_quiz is not None):
         st.session_state.current_quiz = random.choice(quiz_questions)
-        st.experimental_rerun()
+        st.rerun()
