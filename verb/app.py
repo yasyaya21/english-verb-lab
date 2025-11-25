@@ -100,7 +100,7 @@ elif menu == "📝 Latihan Interaktif":
     
     # Tombol untuk Soal Baru
     if st.button("🔄 Soal Baru"):
-        st.experimental_rerun() # Memuat ulang halaman untuk soal baru
+        st.rerun() # Memuat ulang halaman untuk soal baru
 elif menu == "🏆 Kuis":
     st.header("Kuis: Tentukan Verb yang Tepat dalam Kalimat")
     
