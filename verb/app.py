@@ -5,7 +5,6 @@ import random
 # ==============================================================================
 # 1. DATA VERBS
 # ==============================================================================
-# Data verbs yang lebih luas (Anda bisa menambahkannya lagi)
 full_verb_data = {
     "V1 (Base Form)": ["go", "eat", "write", "see", "take", "make", "sing", "drink", "break", "give", "speak", "do", "run"],
     "V2 (Past Simple)": ["went", "ate", "wrote", "saw", "took", "made", "sang", "drank", "broke", "gave", "spoke", "did", "ran"],
@@ -21,17 +20,17 @@ df_verbs = pd.DataFrame(full_verb_data)
 st.set_page_config(
     page_title="Virtual English Verb Lab - V1, V2, V3",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed" # Mengubah ini menjadi 'collapsed' atau 'auto'
 )
 
-# Inisialisasi Session State (Penting untuk mempertahankan data antar rerun)
+# Inisialisasi Session State
 if 'score' not in st.session_state:
     st.session_state['score'] = 0
 if 'current_quiz' not in st.session_state:
     st.session_state['current_quiz'] = None
 if 'current_verb_pair' not in st.session_state:
     st.session_state['current_verb_pair'] = random.choice(df_verbs.values.tolist())
-    
+
 # ==============================================================================
 # 3. FUNGSI UTAMA UNTUK KUIS/LATIHAN BARU
 # ==============================================================================
@@ -53,27 +52,24 @@ def generate_new_verb_pair():
     st.session_state['current_verb_pair'] = random.choice(df_verbs.values.tolist())
 
 # ==============================================================================
-# 4. TAMPILAN UTAMA DAN NAVIGASI
+# 4. TAMPILAN UTAMA DAN NAVIGASI MENGGUNAKAN TABS
 # ==============================================================================
 
 st.title("🧪 Virtual Lab: Three Forms of Verbs (V1, V2, V3)")
 st.caption("Pelajari dan Latih Penggunaan Kata Kerja Bahasa Inggris Interaktif")
 
-# Sidebar untuk Navigasi
-menu = st.sidebar.radio(
-    "Pilih Menu",
-    ("📚 Materi", "📝 Latihan Interaktif", "🏆 Kuis Konteks")
-)
-st.sidebar.markdown("---")
-st.sidebar.markdown(f"**Skor Kuis Anda:** {st.session_state['score']}")
-st.sidebar.markdown("---")
-st.sidebar.markdown("Dibuat dengan Python & Streamlit")
+# --- MENGGANTI SIDEBAR DENGAN TABS DI BAGIAN ATAS ---
+tab1, tab2, tab3 = st.tabs(["📚 Materi", "📝 Latihan Interaktif", "🏆 Kuis Konteks"])
 
-# --- Konten Halaman Berdasarkan Pilihan Menu ---
+# Menampilkan skor di bagian atas sebelum tabs
+st.metric("Skor Kuis Anda Saat Ini", st.session_state['score'])
+st.markdown("---")
 
-## 📚 Materi
+# ==============================================================================
+# 5. KONTEN TAB 1: MATERI
+# ==============================================================================
 
-if menu == "📚 Materi":
+with tab1:
     st.header("Materi: Penggunaan V1, V2, dan V3")
     st.markdown("---")
     
@@ -98,13 +94,14 @@ if menu == "📚 Materi":
     st.dataframe(df_verbs, use_container_width=True)
     st.markdown("💡 **Tips:** Irregular verbs harus dihafalkan karena bentuk V2 dan V3-nya sering berubah total dari V1.")
 
-## 📝 Latihan Interaktif (Tebak Bentuk)
+# ==============================================================================
+# 6. KONTEN TAB 2: LATIHAN INTERAKTIF
+# ==============================================================================
 
-elif menu == "📝 Latihan Interaktif":
+with tab2:
     st.header("Latihan Interaktif: Tebak Bentuk Kata Kerja")
     st.markdown("---")
     
-    # Ambil verb pair dari session state
     v1, v2, v3 = st.session_state['current_verb_pair']
     
     st.subheader(f"Kata Kerja Dasar (V1): **{v1.upper()}**")
@@ -120,42 +117,41 @@ elif menu == "📝 Latihan Interaktif":
         
     with col_input1:
         st.subheader("V2 (Past Simple):")
-        jawaban_v2 = st.text_input("Ketik V2 di sini:", key="v2_input", value="" if st.session_state['v2_status'] is None else st.session_state['v2_input']).strip().lower()
-        if st.button("Cek V2", key="check_v2"):
+        # Menggunakan key unik dengan V1 saat ini agar input reset saat soal baru
+        jawaban_v2 = st.text_input("Ketik V2 di sini:", key=f"v2_input_{v1}", value="").strip().lower()
+        
+        if st.button("Cek V2", key="check_v2_tab2"):
             if jawaban_v2 == v2:
                 st.success(f"🎉 **Benar!** V2 dari '{v1}' adalah **{v2}**.")
-                st.session_state['v2_status'] = 'correct'
             else:
-                st.error(f"❌ **Salah!** Coba lagi. Petunjuk: V2 digunakan untuk Simple Past.")
-                st.session_state['v2_status'] = 'incorrect'
+                st.error(f"❌ **Salah!** Coba lagi. Jawaban yang benar adalah **{v2}**.")
 
     with col_input2:
         st.subheader("V3 (Past Participle):")
-        jawaban_v3 = st.text_input("Ketik V3 di sini:", key="v3_input", value="" if st.session_state['v3_status'] is None else st.session_state['v3_input']).strip().lower()
-        if st.button("Cek V3", key="check_v3"):
+        jawaban_v3 = st.text_input("Ketik V3 di sini:", key=f"v3_input_{v1}", value="").strip().lower()
+        
+        if st.button("Cek V3", key="check_v3_tab2"):
             if jawaban_v3 == v3:
                 st.success(f"🎉 **Benar!** V3 dari '{v1}' adalah **{v3}**.")
-                st.session_state['v3_status'] = 'correct'
             else:
-                st.error(f"❌ **Salah!** Coba lagi. Petunjuk: V3 digunakan setelah Have/Has/Had.")
-                st.session_state['v3_status'] = 'incorrect'
+                st.error(f"❌ **Salah!** Coba lagi. Jawaban yang benar adalah **{v3}**.")
                 
     st.markdown("---")
     
-    if st.button("🔄 Soal Baru"):
+    # Tombol Soal Baru
+    if st.button("🔄 Soal Baru", key="new_verb_tab2"):
         generate_new_verb_pair()
-        st.session_state['v2_status'] = None
-        st.session_state['v3_status'] = None
-        st.rerun() # Menggantikan st.experimental_rerun()
+        st.rerun() # Memuat ulang aplikasi untuk mendapatkan soal baru
 
-## 🏆 Kuis Konteks (Multiple Choice)
+# ==============================================================================
+# 7. KONTEN TAB 3: KUIS KONTEKS
+# ==============================================================================
 
-elif menu == "🏆 Kuis Konteks":
-    st.header("Kuis Konteks: Tentukan Bentuk Kata Kerja yang Tepat dalam Kalimat")
-    st.markdown("Uji pemahaman Anda tentang kapan menggunakan V1, V2, atau V3.")
+with tab3:
+    st.header("Kuis Konteks: Tentukan Bentuk Kata Kerja yang Tepat")
+    st.markdown("Uji pemahaman Anda tentang kapan menggunakan V1, V2, atau V3 berdasarkan konteks kalimat.")
     st.markdown("---")
     
-    # Panggil fungsi untuk memastikan ada soal
     if st.session_state['current_quiz'] is None:
         generate_new_quiz()
 
@@ -164,39 +160,36 @@ elif menu == "🏆 Kuis Konteks":
     st.markdown(f"**Soal:** Lengkapi kalimat berikut dengan bentuk kata kerja yang tepat:")
     st.subheader(f"\"{question['sentence'].replace('___', '**...**')}\"")
     
-    # Input Pilihan Ganda (Radio Buttons)
-    # Gunakan key unik untuk setiap kali soal di-rerun
+    # Input Pilihan Ganda
     user_choice = st.radio(
         "Pilih jawaban yang paling tepat:",
         question["options"],
-        key="quiz_radio_options"
+        key=f"quiz_radio_options_{question['answer']}" # Key unik
     )
     
-    # Inisialisasi status kuis
     if 'quiz_checked' not in st.session_state:
         st.session_state['quiz_checked'] = False
         
-    if st.button("Kirim Jawaban", disabled=st.session_state['quiz_checked']):
-        st.session_state['quiz_checked'] = True
-        
+    # Memastikan tombol "Kirim Jawaban" hanya bisa diklik sekali per soal
+    if st.button("Kirim Jawaban", key="submit_quiz_tab3"):
         if user_choice == question["answer"]:
-            st.balloons() # Efek visual untuk jawaban benar
+            st.balloons()
             st.success(f"✅ **Jawaban Benar!** ({question['correct_form']}).")
             st.session_state['score'] += 1
         else:
             st.error(f"❌ **Jawaban Salah.** Jawaban yang benar adalah **{question['answer']}**.")
             
-        st.info(f"**Penjelasan:** Kata kunci dalam kalimat ini menunjukkan penggunaan {question['correct_form']}, sehingga membutuhkan bentuk **{question['answer']}**.")
+        st.info(f"**Penjelasan:** Kata kunci dalam kalimat ini menunjukkan penggunaan **{question['correct_form']}**, sehingga membutuhkan bentuk **{question['answer']}**.")
+        st.session_state['quiz_checked'] = True # Menandai soal sudah dijawab
         
     st.markdown("---")
     
-    col_score, col_next = st.columns([1, 1])
-    
-    with col_score:
-        st.metric("Total Skor Anda", st.session_state['score'])
-        
-    with col_next:
-        if st.button("Lanjut Soal Berikutnya", disabled=not st.session_state['quiz_checked']):
+    if st.session_state.get('quiz_checked', False):
+        if st.button("Lanjut Soal Berikutnya", key="next_quiz_tab3"):
             generate_new_quiz()
             st.session_state['quiz_checked'] = False
-            st.rerun() # Menggantikan st.experimental_rerun()
+            st.rerun()
+    else:
+        st.button("Lanjut Soal Berikutnya", key="disabled_next_quiz", disabled=True)
+        
+    st.markdown(f"**Skor Kuis Total:** **{st.session_state['score']}**")
